@@ -1,0 +1,303 @@
+syntax = "proto3";
+
+package marketing;
+
+option go_package = "github.com/bookmarketing/marketing-saas/packages/grpc-protos";
+
+// Campaign Service
+service CampaignService {
+  rpc GetCampaign(GetCampaignRequest) returns (CampaignResponse);
+  rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse);
+  rpc CreateCampaign(CreateCampaignRequest) returns (CampaignResponse);
+  rpc UpdateCampaign(UpdateCampaignRequest) returns (CampaignResponse);
+  rpc DeleteCampaign(DeleteCampaignRequest) returns (DeleteResponse);
+  rpc PauseCampaign(PauseCampaignRequest) returns (OperationResponse);
+  rpc ActivateCampaign(ActivateCampaignRequest) returns (OperationResponse);
+}
+
+// A/B Test Service
+service ABTestService {
+  rpc GetABTest(GetABTestRequest) returns (ABTestResponse);
+  rpc ListABTests(ListABTestsRequest) returns (ListABTestsResponse);
+  rpc CreateABTest(CreateABTestRequest) returns (ABTestResponse);
+  rpc UpdateABTest(UpdateABTestRequest) returns (ABTestResponse);
+  rpc DeleteABTest(DeleteABTestRequest) returns (DeleteResponse);
+  rpc StartABTest(StartABTestRequest) returns (OperationResponse);
+  rpc CompleteABTest(CompleteABTestRequest) returns (OperationResponse);
+}
+
+// Analytics Service
+service AnalyticsService {
+  rpc GetDashboard(GetDashboardRequest) returns (DashboardResponse);
+  rpc GetMetrics(GetMetricsRequest) returns (MetricsResponse);
+  rpc StreamMetrics(StreamMetricsRequest) returns (stream MetricsResponse);
+}
+
+// Competitor Service
+service CompetitorService {
+  rpc GetCompetitor(GetCompetitorRequest) returns (CompetitorResponse);
+  rpc ListCompetitors(ListCompetitorsRequest) returns (ListCompetitorsResponse);
+  rpc CreateCompetitor(CreateCompetitorRequest) returns (CompetitorResponse);
+  rpc UpdateCompetitor(UpdateCompetitorRequest) returns (CompetitorResponse);
+  rpc DeleteCompetitor(DeleteCompetitorRequest) returns (DeleteResponse);
+  rpc AnalyzeCompetitor(AnalyzeCompetitorRequest) returns (CompetitorAnalysisResponse);
+}
+
+// ============ Campaign Messages ============
+
+message GetCampaignRequest {
+  string id = 1;
+}
+
+message ListCampaignsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string status = 3;
+  string type = 4;
+}
+
+message CreateCampaignRequest {
+  string name = 1;
+  string type = 2;
+  double budget = 3;
+  string start_date = 4;
+  optional string end_date = 5;
+}
+
+message UpdateCampaignRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string type = 3;
+  optional string status = 4;
+  optional double budget = 5;
+  optional double spent = 6;
+  optional int64 impressions = 7;
+  optional int64 clicks = 8;
+  optional int64 conversions = 9;
+}
+
+message DeleteCampaignRequest {
+  string id = 1;
+}
+
+message PauseCampaignRequest {
+  string id = 1;
+}
+
+message ActivateCampaignRequest {
+  string id = 1;
+}
+
+message CampaignResponse {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string status = 4;
+  double budget = 5;
+  double spent = 6;
+  int64 impressions = 7;
+  int64 clicks = 8;
+  int64 conversions = 9;
+  double ctr = 10;
+  double conversion_rate = 11;
+  double budget_utilization = 12;
+  string start_date = 13;
+  optional string end_date = 14;
+  string created_at = 15;
+  string updated_at = 16;
+}
+
+message ListCampaignsResponse {
+  repeated CampaignResponse campaigns = 1;
+  int32 total = 2;
+}
+
+// ============ A/B Test Messages ============
+
+message GetABTestRequest {
+  string id = 1;
+}
+
+message ListABTestsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string status = 3;
+}
+
+message CreateABTestRequest {
+  string name = 1;
+  string variant = 2;
+  string start_date = 3;
+}
+
+message UpdateABTestRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string variant = 3;
+  optional string status = 4;
+  optional int64 visitors = 5;
+  optional int64 conversions = 6;
+}
+
+message DeleteABTestRequest {
+  string id = 1;
+}
+
+message StartABTestRequest {
+  string id = 1;
+}
+
+message CompleteABTestRequest {
+  string id = 1;
+}
+
+message ABTestResponse {
+  string id = 1;
+  string name = 2;
+  string variant = 3;
+  string status = 4;
+  int64 visitors = 5;
+  int64 conversions = 6;
+  double conversion_rate = 7;
+  double confidence = 8;
+  string start_date = 9;
+  optional string end_date = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message ListABTestsResponse {
+  repeated ABTestResponse tests = 1;
+  int32 total = 2;
+}
+
+// ============ Analytics Messages ============
+
+message GetDashboardRequest {
+  string period = 1;
+}
+
+message GetMetricsRequest {
+  string metric_type = 1;
+  string start_date = 2;
+  string end_date = 3;
+}
+
+message StreamMetricsRequest {
+  string metric_type = 1;
+  int32 interval_seconds = 2;
+}
+
+message DashboardResponse {
+  int64 total_campaigns = 1;
+  int64 active_campaigns = 2;
+  double total_spend = 3;
+  double total_revenue = 4;
+  double roi = 5;
+  double conversion_rate = 6;
+  repeated ChannelPerformance top_channels = 7;
+}
+
+message MetricsResponse {
+  string metric_type = 1;
+  double value = 2;
+  double change_percent = 3;
+  string trend = 4;
+  repeated DataPoint data_points = 5;
+}
+
+message ChannelPerformance {
+  string name = 1;
+  double value = 2;
+}
+
+message DataPoint {
+  string timestamp = 1;
+  double value = 2;
+}
+
+// ============ Competitor Messages ============
+
+message GetCompetitorRequest {
+  string id = 1;
+}
+
+message ListCompetitorsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message CreateCompetitorRequest {
+  string competitor_name = 1;
+  string domain = 2;
+  string type = 3;
+}
+
+message UpdateCompetitorRequest {
+  string id = 1;
+  optional string competitor_name = 2;
+  optional string domain = 3;
+  optional string type = 4;
+  optional double market_share = 5;
+  optional int32 seo_score = 6;
+  optional double sem_spend = 7;
+  optional int32 keywords = 8;
+  optional int32 backlinks = 9;
+  optional int32 social_followers = 10;
+}
+
+message DeleteCompetitorRequest {
+  string id = 1;
+}
+
+message AnalyzeCompetitorRequest {
+  string id = 1;
+}
+
+message CompetitorResponse {
+  string id = 1;
+  string competitor_name = 2;
+  string domain = 3;
+  string type = 4;
+  double market_share = 5;
+  int32 seo_score = 6;
+  double sem_spend = 7;
+  int32 keywords = 8;
+  int32 backlinks = 9;
+  int32 social_followers = 10;
+  string last_analyzed = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message ListCompetitorsResponse {
+  repeated CompetitorResponse competitors = 1;
+  int32 total = 2;
+}
+
+message CompetitorAnalysisResponse {
+  CompetitorResponse competitor = 1;
+  AnalysisResult analysis = 2;
+  repeated string recommendations = 3;
+}
+
+message AnalysisResult {
+  double position_score = 1;
+  string market_position = 2;
+  double growth_potential = 3;
+  repeated string strengths = 4;
+  repeated string weaknesses = 5;
+  string threat_level = 6;
+}
+
+// ============ Common Messages ============
+
+message DeleteResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message OperationResponse {
+  bool success = 1;
+  string message = 2;
+}

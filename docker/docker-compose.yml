@@ -1,0 +1,95 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: marketing-saas-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: marketing_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/libgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+      - ../api-go/migrations:/docker-entrypoint-initdb.d/go-migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketing-saas-network
+
+  # Go API Service
+  api-go:
+    build:
+      context: ../api-go
+      dockerfile: Dockerfile
+    container_name: marketing-saas-go
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/marketing_saas?sslmode=disable
+      PYTHON_API_URL: http://api-python:8081
+      GRPC_PORT: 9091
+      JWT_SECRET: your-production-secret-change-me
+      LOG_LEVEL: info
+    ports:
+      - "8080:8080"
+      - "9091:9091"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - marketing-saas-network
+    restart: unless-stopped
+
+  # Python FastAPI Service
+  api-python:
+    build:
+      context: ../api-python
+      dockerfile: Dockerfile
+    container_name: marketing-saas-python
+    environment:
+      PORT: 8081
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/marketing_saas?sslmode=disable
+      GO_API_URL: http://api-go:8080
+      GRPC_SERVER_URL: api-go:9090
+      LOG_LEVEL: info
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - marketing-saas-network
+    restart: unless-stopped
+
+  # Next.js Frontend
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_GO_URL: http://localhost:8080
+        NEXT_PUBLIC_API_PYTHON_URL: http://localhost:8081
+    container_name: marketing-saas-web
+    environment:
+      API_GO_URL: http://api-go:8080
+      API_PYTHON_URL: http://api-python:8081
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-go
+      - api-python
+    networks:
+      - marketing-saas-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  marketing-saas-network:
+    driver: bridge

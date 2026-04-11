@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketPro - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <span>📊</span>
+            <span>MarketPro</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="campaigns.html" class="nav-item">
+                <span class="nav-icon">📢</span>
+                <span>Campaigns</span>
+            </a>
+            <a href="seo.html" class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span>SEO & SEM</span>
+            </a>
+            <a href="competitors.html" class="nav-item">
+                <span class="nav-icon">🎯</span>
+                <span>Competitors</span>
+            </a>
+            <a href="ab-testing.html" class="nav-item">
+                <span class="nav-icon">🧪</span>
+                <span>A/B Testing</span>
+            </a>
+            <a href="analytics.html" class="nav-item">
+                <span class="nav-icon">📈</span>
+                <span>Analytics</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1 id="page-title">Dashboard Overview</h1>
+                <p id="current-date" style="color: #6b7280; font-size: 0.875rem; margin-top: 4px;"></p>
+            </div>
+            <div class="user-menu">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    🔄 Refresh
+                </button>
+                <div class="user-info">
+                    <span id="user-name" style="color: #6b7280;">Demo User</span>
+                    <div class="avatar">D</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading data from APIs...</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" id="stat-revenue">$0</div>
+                <div class="stat-change up" id="stat-revenue-change">
+                    ↑ 0% vs last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Spend</div>
+                <div class="stat-value" id="stat-spend">$0</div>
+                <div class="stat-change up" id="stat-spend-change">
+                    ↑ 0% vs last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">ROI</div>
+                <div class="stat-value" id="stat-roi">0%</div>
+                <div class="stat-change up" id="stat-roi-change">
+                    ↑ 0% vs last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value" id="stat-conversion">0%</div>
+                <div class="stat-change down" id="stat-conversion-change">
+                    ↓ 0% vs last month
+                </div>
+            </div>
+        </div>
+
+        <!-- API Status -->
+        <div class="api-status" id="api-status">
+            <div class="status-item">
+                <span class="status-dot success"></span>
+                <span>Go API</span>
+                <span class="status-url">localhost:8080</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot success"></span>
+                <span>Python API</span>
+                <span class="status-url">localhost:8081</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot success"></span>
+                <span>PostgreSQL</span>
+                <span class="status-url">localhost:5432</span>
+            </div>
+        </div>
+
+        <!-- Campaigns Table -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Campaign Performance</h2>
+                <button class="btn btn-primary" onclick="showCreateCampaign()">+ New Campaign</button>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Campaign Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Budget</th>
+                            <th>Spent</th>
+                            <th>Progress</th>
+                            <th>Conversions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaigns-table">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px;">
+                                Loading campaigns...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Channels -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Top Channels</h2>
+            </div>
+            <div class="channels-grid" id="channels-grid">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Campaign Modal -->
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Campaign</h2>
+                <button class="btn-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="createCampaignForm">
+                <div class="form-group">
+                    <label>Campaign Name</label>
+                    <input type="text" id="campaign-name" required placeholder="Summer Sale 2024">
+                </div>
+                <div class="form-group">
+                    <label>Campaign Type</label>
+                    <select id="campaign-type" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                        <option value="SEM">SEM (Search Engine Marketing)</option>
+                        <option value="SEO">SEO (Search Engine Optimization)</option>
+                        <option value="Social">Social Media</option>
+                        <option value="Email">Email Marketing</option>
+                        <option value="Display">Display Ads</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Budget ($)</label>
+                    <input type="number" id="campaign-budget" required placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="campaign-start" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date (Optional)</label>
+                    <input type="date" id="campaign-end">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Campaign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

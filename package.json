@@ -1,0 +1,23 @@
+{
+  "name": "marketing-saas-platform",
+  "version": "1.0.0",
+  "description": "Marketing SaaS platform with Next.js, Go, Python, gRPC, and PostgreSQL",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:go\" \"npm run dev:python\"",
+    "dev:web": "cd web && npm run dev",
+    "dev:go": "make -C api-go run",
+    "dev:python": "make -C api-python run",
+    "build": "cd web && npm run build",
+    "docker:up": "docker compose -f docker/docker-compose.dev.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.dev.yml down",
+    "docker:full": "docker compose -f docker/docker-compose.yml up --build",
+    "proto:generate": "make -C packages/grpc-protos generate"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
