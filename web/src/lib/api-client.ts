@@ -20,14 +20,14 @@ import type {
 } from '@bookmarketing/shared-types';
 
 // Use Next.js API proxy instead of direct backend URLs
-const apiGo: AxiosInstance = axios.create({
+export const apiGo: AxiosInstance = axios.create({
   baseURL: '/api/go', // Proxied to Go API
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-const apiPython: AxiosInstance = axios.create({
+export const apiPython: AxiosInstance = axios.create({
   baseURL: '/api/python', // Proxied to Python API
   headers: {
     'Content-Type': 'application/json',

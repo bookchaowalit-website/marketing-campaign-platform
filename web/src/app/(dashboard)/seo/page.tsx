@@ -48,7 +48,19 @@ export default function SEOPage() {
   const { data: metrics, isLoading: metricsLoading } = useQuery<SEOMetrics>({
     queryKey: ['seo-metrics'],
     queryFn: async () => {
-      return seoApi.getMetrics('example.com')
+      // The API returns { metrics: {...}, recommendations: [] } with
+      // snake_case field names that don't all match this page's local
+      // shape (real API: keywords, page_speed; no referring_domains).
+      const { metrics: m } = await seoApi.getMetrics('example.com')
+      return {
+        organic_traffic: m.organic_traffic,
+        keywords_tracked: m.keywords,
+        avg_position: m.avg_position,
+        domain_authority: m.domain_authority,
+        page_speed_score: m.page_speed,
+        backlinks: m.backlinks,
+        referring_domains: 0,
+      }
     },
     initialData: defaultMetrics,
   })
@@ -56,7 +68,16 @@ export default function SEOPage() {
   const { data: keywords, isLoading: keywordsLoading } = useQuery<KeywordRanking[]>({
     queryKey: ['seo-keywords'],
     queryFn: async () => {
-      return seoApi.getKeywords('example.com')
+      // The API returns `search_volume`, not `volume`.
+      const raw: Array<{ keyword: string; position: number; search_volume: number; difficulty: number; trend: string }> =
+        await seoApi.getKeywords('example.com')
+      return raw.map((kw) => ({
+        keyword: kw.keyword,
+        position: kw.position,
+        volume: kw.search_volume,
+        difficulty: kw.difficulty,
+        trend: kw.trend,
+      }))
     },
     initialData: defaultKeywords,
   })

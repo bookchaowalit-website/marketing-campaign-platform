@@ -41,7 +41,8 @@ interface SEOMetricsData {
 interface KeywordData {
   keyword: string
   position: number
-  volume: number
+  volume?: number
+  search_volume?: number
   difficulty?: number
   cpc?: number
   clicks?: number
@@ -55,7 +56,8 @@ const DOMAIN = 'yoursite.com' // Can be made configurable
 export function SEODashboard() {
   const { data: seoMetrics, isLoading: metricsLoading } = useQuery<SEOMetricsData>({
     queryKey: ['seoMetrics', DOMAIN],
-    queryFn: () => seoApi.getMetrics(DOMAIN),
+    // The API returns { metrics: {...}, recommendations: [] }, not a flat object.
+    queryFn: async () => (await seoApi.getMetrics(DOMAIN)).metrics,
   })
 
   const { data: keywords, isLoading: keywordsLoading } = useQuery<KeywordData[]>({
@@ -78,7 +80,7 @@ export function SEODashboard() {
     ? keywords.map(k => ({
       keyword: k.keyword,
       position: k.position || 0,
-      volume: k.volume || 0,
+      volume: k.search_volume || k.volume || 0,
       difficulty: k.difficulty || 0,
       trend: k.trend || 'stable',
     }))

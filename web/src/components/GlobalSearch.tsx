@@ -274,7 +274,7 @@ export default function GlobalSearch() {
         {flatResults.length === 0 ? (
           <Box sx={{ py: 6, textAlign: 'center' }}>
             <SearchIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-            <Typography color="text.secondary">No results found for "{query}"</Typography>
+            <Typography color="text.secondary">No results found for &quot;{query}&quot;</Typography>
           </Box>
         ) : (
           <List ref={listRef} sx={{ py: 0.5, px: 1 }}>
