@@ -2,7 +2,6 @@ package http
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/bookmarketing/marketing-saas/api-go/internal/application/service"

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/bookmarketing/marketing-saas/api-go/internal/domain"
 )
@@ -188,11 +187,7 @@ func (s *SMSService) SendCampaign(ctx context.Context, id string) error {
 		}
 	}
 
-	// Update campaign stats
-	status := "sent"
-	if failedCount > 0 && sentCount == 0 {
-		status = "failed"
-	}
+	// Update campaign stats (repository computes and persists status itself)
 	if err := s.campaignRepo.UpdateSendStats(id, sentCount, deliveredCount, failedCount, totalCost); err != nil {
 		return err
 	}

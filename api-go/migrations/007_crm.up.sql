@@ -460,21 +460,26 @@ CREATE TRIGGER update_custom_field_definitions_updated_at BEFORE UPDATE ON custo
 -- =====================================================
 -- 16. DEFAULT PIPELINE STAGES
 -- =====================================================
+-- organization_id is NOT NULL + REFERENCES organizations(id); this
+-- originally omitted it entirely and could never have run. Scoped to the
+-- demo organization seeded in 005_organizations.up.sql — per-organization
+-- stages for real tenants should be created by the application at
+-- provisioning time, not hardcoded per-org here.
 
-INSERT INTO pipeline_stages (name, color, position, probability, is_system_stage, requirements) VALUES
-('Lead In', '#9E9E9E', 0, 10, true, 'Initial contact identified'),
-('Qualified', '#FF9800', 1, 20, true, 'Contact meets qualification criteria'),
-('Proposal', '#2196F3', 2, 50, true, 'Proposal sent to contact'),
-('Negotiation', '#FFC107', 3, 75, true, 'In negotiation phase'),
-('Won', '#4CAF50', 4, 100, true, 'Deal successfully closed'),
-('Lost', '#F44336', 5, 0, true, 'Deal was lost');
+INSERT INTO pipeline_stages (organization_id, name, color, position, probability, is_system_stage, requirements) VALUES
+('00000000-0000-0000-0000-000000000001', 'Lead In', '#9E9E9E', 0, 10, true, 'Initial contact identified'),
+('00000000-0000-0000-0000-000000000001', 'Qualified', '#FF9800', 1, 20, true, 'Contact meets qualification criteria'),
+('00000000-0000-0000-0000-000000000001', 'Proposal', '#2196F3', 2, 50, true, 'Proposal sent to contact'),
+('00000000-0000-0000-0000-000000000001', 'Negotiation', '#FFC107', 3, 75, true, 'In negotiation phase'),
+('00000000-0000-0000-0000-000000000001', 'Won', '#4CAF50', 4, 100, true, 'Deal successfully closed'),
+('00000000-0000-0000-0000-000000000001', 'Lost', '#F44336', 5, 0, true, 'Deal was lost');
 
 -- =====================================================
 -- 17. DEFAULT LEAD SCORING PROFILE
 -- =====================================================
 
-INSERT INTO lead_scoring_profiles (name, description, is_default, score_ranges) VALUES
-('Default Scoring Profile', 'Standard lead scoring model for B2B sales', true, '{"hot": {"min": 80, "max": 100, "label": "Hot Lead"}, "warm": {"min": 50, "max": 79, "label": "Warm Lead"}, "cold": {"min": 0, "max": 49, "label": "Cold Lead"}}'::jsonb);
+INSERT INTO lead_scoring_profiles (organization_id, name, description, is_default, score_ranges) VALUES
+('00000000-0000-0000-0000-000000000001', 'Default Scoring Profile', 'Standard lead scoring model for B2B sales', true, '{"hot": {"min": 80, "max": 100, "label": "Hot Lead"}, "warm": {"min": 50, "max": 79, "label": "Warm Lead"}, "cold": {"min": 0, "max": 49, "label": "Cold Lead"}}'::jsonb);
 
 -- =====================================================
 -- 18. DEFAULT LEAD SCORING RULES

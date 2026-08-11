@@ -19,16 +19,6 @@ func NewSocialScheduler() *SocialScheduler {
 	return s
 }
 
-// Start starts the scheduler's cleanup routine
-func (s *SocialScheduler) Start() {
-	go func() {
-		ticker := time.NewTicker(1 * time.Hour)
-		for range ticker.C {
-			s.cleanup()
-		}
-	}()
-}
-
 // SchedulePost schedules a post for future publishing
 func (s *SocialScheduler) SchedulePost(postID string, scheduledAt time.Time, publishFunc func()) {
 	s.mu.Lock()
@@ -64,19 +54,5 @@ func (s *SocialScheduler) CancelPost(postID string) {
 	if timer, ok := s.timers[postID]; ok {
 		timer.Stop()
 		delete(s.timers, postID)
-	}
-}
-
-// cleanup removes expired timers
-func (s *SocialScheduler) cleanup() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for id, timer := range s.timers {
-		if !timer.Stop() {
-			delete(s.timers, id)
-		} else {
-			timer.Reset(timer.Duration)
-		}
 	}
 }

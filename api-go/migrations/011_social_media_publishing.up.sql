@@ -1,7 +1,7 @@
 -- Add social media tables for publishing
 
 -- Social accounts (connected Facebook/Instagram/etc.)
-CREATE TABLE IF NOT EXISTS social_accounts (
+CREATE TABLE IF NOT EXISTS social_publish_accounts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL,
     platform VARCHAR(50) NOT NULL CHECK (platform IN ('facebook', 'instagram', 'twitter', 'linkedin')),
@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS social_accounts (
 );
 
 -- Social posts
-CREATE TABLE IF NOT EXISTS social_posts (
+CREATE TABLE IF NOT EXISTS social_publish_posts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL,
-    account_id UUID REFERENCES social_accounts(id) ON DELETE CASCADE,
+    account_id UUID REFERENCES social_publish_accounts(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     media_urls TEXT[],
     hashtags TEXT[],
@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS social_posts (
 );
 
 -- Social post analytics
-CREATE TABLE IF NOT EXISTS social_post_analytics (
+CREATE TABLE IF NOT EXISTS social_publish_post_analytics (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    post_id UUID REFERENCES social_posts(id) ON DELETE CASCADE UNIQUE,
+    post_id UUID REFERENCES social_publish_posts(id) ON DELETE CASCADE UNIQUE,
     platform VARCHAR(50) NOT NULL,
     impressions INTEGER DEFAULT 0,
     reach INTEGER DEFAULT 0,
@@ -52,14 +52,14 @@ CREATE TABLE IF NOT EXISTS social_post_analytics (
 );
 
 -- Indexes
-CREATE INDEX idx_social_accounts_org_id ON social_accounts(organization_id);
-CREATE INDEX idx_social_accounts_platform ON social_accounts(platform);
-CREATE INDEX idx_social_posts_org_id ON social_posts(organization_id);
-CREATE INDEX idx_social_posts_account_id ON social_posts(account_id);
-CREATE INDEX idx_social_posts_status ON social_posts(status);
-CREATE INDEX idx_social_posts_scheduled_at ON social_posts(scheduled_at);
-CREATE INDEX idx_social_analytics_post_id ON social_post_analytics(post_id);
+CREATE INDEX idx_social_publish_accounts_org_id ON social_publish_accounts(organization_id);
+CREATE INDEX idx_social_publish_accounts_platform ON social_publish_accounts(platform);
+CREATE INDEX idx_social_publish_posts_org_id ON social_publish_posts(organization_id);
+CREATE INDEX idx_social_publish_posts_account_id ON social_publish_posts(account_id);
+CREATE INDEX idx_social_publish_posts_status ON social_publish_posts(status);
+CREATE INDEX idx_social_publish_posts_scheduled_at ON social_publish_posts(scheduled_at);
+CREATE INDEX idx_social_publish_analytics_post_id ON social_publish_post_analytics(post_id);
 
 -- Trigger for updated_at
-CREATE TRIGGER update_social_accounts_updated_at BEFORE UPDATE ON social_accounts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_social_posts_updated_at BEFORE UPDATE ON social_posts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_social_publish_accounts_updated_at BEFORE UPDATE ON social_publish_accounts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_social_publish_posts_updated_at BEFORE UPDATE ON social_publish_posts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

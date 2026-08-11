@@ -274,7 +274,6 @@ func (s *EmailCampaignService) TrackEmailEvent(ctx context.Context, sendID strin
 		return fmt.Errorf("failed to get campaign/subscriber details: %w", err)
 	}
 
-	now := time.Now()
 	var updateQuery string
 	var eventQuery string
 

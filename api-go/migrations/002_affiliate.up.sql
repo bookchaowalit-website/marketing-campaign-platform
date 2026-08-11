@@ -71,6 +71,24 @@ CREATE TABLE IF NOT EXISTS referrals (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Affiliate Payouts table - Payment records to affiliates
+-- (created before Commissions: Commissions.payout_id references this table)
+CREATE TABLE IF NOT EXISTS affiliate_payouts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    affiliate_id UUID REFERENCES affiliates(id) ON DELETE CASCADE,
+    amount DECIMAL(15,2) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')),
+    payment_method VARCHAR(50) NOT NULL CHECK (payment_method IN ('paypal', 'bank_transfer', 'stripe', 'manual')),
+    payment_reference VARCHAR(100), -- Transaction ID or reference
+    payment_notes TEXT,
+    commissions JSONB, -- Array of commission IDs included in this payout
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP WITH TIME ZONE,
+    processed_by UUID REFERENCES users(id),
+    completed_at TIMESTAMP WITH TIME ZONE
+);
+
 -- Commissions table - Commission records
 CREATE TABLE IF NOT EXISTS commissions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -89,23 +107,6 @@ CREATE TABLE IF NOT EXISTS commissions (
     payout_id UUID REFERENCES affiliate_payouts(id)
 );
 
--- Affiliate Payouts table - Payment records to affiliates
-CREATE TABLE IF NOT EXISTS affiliate_payouts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    affiliate_id UUID REFERENCES affiliates(id) ON DELETE CASCADE,
-    amount DECIMAL(15,2) NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')),
-    payment_method VARCHAR(50) NOT NULL CHECK (payment_method IN ('paypal', 'bank_transfer', 'stripe', 'manual')),
-    payment_reference VARCHAR(100), -- Transaction ID or reference
-    payment_notes TEXT,
-    commissions JSONB, -- Array of commission IDs included in this payout
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    processed_at TIMESTAMP WITH TIME ZONE,
-    processed_by UUID REFERENCES users(id),
-    completed_at TIMESTAMP WITH TIME ZONE
-);
-
 -- Affiliate Settings table - Program configuration per organization
 CREATE TABLE IF NOT EXISTS affiliate_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -113,7 +114,7 @@ CREATE TABLE IF NOT EXISTS affiliate_settings (
     program_name VARCHAR(255) DEFAULT 'Affiliate Program',
     program_description TEXT,
     default_commission_rate DECIMAL(5,4) DEFAULT 0.1000,
-    default_commission_type VARCHAR(50) DEFAULT 'percentage' CHECK (commission_type IN ('percentage', 'fixed')),
+    default_commission_type VARCHAR(50) DEFAULT 'percentage' CHECK (default_commission_type IN ('percentage', 'fixed')),
     default_fixed_commission DECIMAL(15,2) DEFAULT 0,
     cookie_duration_days INTEGER DEFAULT 30,
     minimum_payout_amount DECIMAL(15,2) DEFAULT 50.00,

@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/bookmarketing/marketing-saas/api-go/internal/domain"
 )
 
 // FacebookClient implements SocialPublishClient for Facebook Pages
@@ -253,16 +255,7 @@ func (f *FacebookClient) DeletePost(accessToken, postID string) error {
 	return nil
 }
 
-func (f *FacebookClient) GetAnalytics(accessToken, postID string) (*struct {
-	PostID       string
-	Impressions  int
-	Reach        int
-	Likes        int
-	Comments     int
-	Shares       int
-	Clicks       int
-	EngagementRate float64
-}, error) {
+func (f *FacebookClient) GetAnalytics(accessToken, postID string) (*domain.SocialPostAnalytics, error) {
 	// Get post insights
 	insightsURL := fmt.Sprintf("%s/%s/%s/insights?metric=post_impressions,post_reach,post_impressions_unique,post_engagements", f.baseURL, f.appVersion, postID)
 	req, _ := http.NewRequest("GET", insightsURL, nil)
@@ -287,16 +280,11 @@ func (f *FacebookClient) GetAnalytics(accessToken, postID string) (*struct {
 		return nil, err
 	}
 
-	analytics := &struct {
-		PostID       string
-		Impressions  int
-		Reach        int
-		Likes        int
-		Comments     int
-		Shares       int
-		Clicks       int
-		EngagementRate float64
-	}{PostID: postID}
+	analytics := &domain.SocialPostAnalytics{
+		PostID:    postID,
+		Platform:  "facebook",
+		FetchedAt: time.Now(),
+	}
 
 	// Map insights to analytics
 	for _, insight := range insightsResult.Data {

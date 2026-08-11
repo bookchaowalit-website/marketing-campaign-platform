@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/bookmarketing/marketing-saas/api-go/internal/domain"
 )
 
 // InstagramClient implements SocialPublishClient for Instagram Business
@@ -193,16 +195,7 @@ func (i *InstagramClient) DeletePost(accessToken, postID string) error {
 	return nil
 }
 
-func (i *InstagramClient) GetAnalytics(accessToken, postID string) (*struct {
-	PostID        string
-	Impressions   int
-	Reach         int
-	Likes         int
-	Comments      int
-	Saves         int
-	Shares        int
-	EngagementRate float64
-}, error) {
+func (i *InstagramClient) GetAnalytics(accessToken, postID string) (*domain.SocialPostAnalytics, error) {
 	// Get post insights
 	insightsURL := fmt.Sprintf("%s/v18.0/%s/insights?metric=impressions,reach,likes,comments,saves,shares,engagement", i.facebookClient.baseURL, postID)
 	req, _ := http.NewRequest("GET", insightsURL, nil)
@@ -226,16 +219,11 @@ func (i *InstagramClient) GetAnalytics(accessToken, postID string) (*struct {
 		return nil, err
 	}
 
-	analytics := &struct {
-		PostID        string
-		Impressions   int
-		Reach         int
-		Likes         int
-		Comments      int
-		Saves         int
-		Shares        int
-		EngagementRate float64
-	}{PostID: postID}
+	analytics := &domain.SocialPostAnalytics{
+		PostID:    postID,
+		Platform:  "instagram",
+		FetchedAt: time.Now(),
+	}
 
 	for _, insight := range insightsResult.Data {
 		if len(insight.Values) > 0 {
@@ -315,7 +303,7 @@ func (i *InstagramClient) PublishReel(accessToken, videoURL, caption string, thu
 	if err != nil {
 		return "", err
 	}
-	defer pubResp.Close()
+	defer pubResp.Body.Close()
 
 	var publishResult struct {
 		ID string `json:"id"`
@@ -374,7 +362,7 @@ func (i *InstagramClient) PublishStory(accessToken, mediaURL string, isVideo boo
 	if err != nil {
 		return "", err
 	}
-	defer pubResp.Close()
+	defer pubResp.Body.Close()
 
 	var publishResult struct {
 		ID string `json:"id"`

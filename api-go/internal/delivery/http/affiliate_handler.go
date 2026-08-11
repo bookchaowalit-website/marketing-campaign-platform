@@ -95,7 +95,7 @@ func (h *AffiliateHandler) GetAllAffiliates(c *gin.Context) {
 	var err error
 
 	if status != "" {
-		affiliates, err = h.service.affiliateRepo.GetByStatus(c.Request.Context(), defaultOrganizationID, status, limit, offset)
+		affiliates, err = h.service.GetAffiliatesByStatus(c.Request.Context(), defaultOrganizationID, status, limit, offset)
 	} else {
 		affiliates, err = h.service.GetAllAffiliates(c.Request.Context(), defaultOrganizationID, limit, offset)
 	}
@@ -191,7 +191,7 @@ func (h *AffiliateHandler) UpdateAffiliate(c *gin.Context) {
 		affiliate.Description = req.Description
 	}
 
-	if err := h.service.affiliateRepo.Update(c.Request.Context(), affiliate); err != nil {
+	if err := h.service.UpdateAffiliate(c.Request.Context(), affiliate); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -357,7 +357,7 @@ func (h *AffiliateHandler) GetAffiliateLinks(c *gin.Context) {
 func (h *AffiliateHandler) DeleteAffiliateLink(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.service.linkRepo.Delete(c.Request.Context(), id); err != nil {
+	if err := h.service.DeleteAffiliateLink(c.Request.Context(), id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -460,7 +460,7 @@ func (h *AffiliateHandler) GetCommissions(c *gin.Context) {
 
 	var commissions []*domain.Commission
 	if status != "" {
-		commissions, err = h.service.commissionRepo.GetByStatus(c.Request.Context(), affiliate.ID, status, limit, offset)
+		commissions, err = h.service.GetCommissionsByStatus(c.Request.Context(), affiliate.ID, status, limit, offset)
 	} else {
 		commissions, err = h.service.GetCommissions(c.Request.Context(), affiliate.ID, limit, offset)
 	}

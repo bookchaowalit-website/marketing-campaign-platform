@@ -2,8 +2,8 @@ package domain
 
 import "time"
 
-// SocialAccount represents a connected social media account
-type SocialAccount struct {
+// SocialPublishAccount represents a connected social media account
+type SocialPublishAccount struct {
 	ID             string    `json:"id"`
 	OrganizationID string    `json:"organization_id"`
 	Platform       string    `json:"platform"`
@@ -18,8 +18,8 @@ type SocialAccount struct {
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
-// SocialPost represents a post to be published
-type SocialPost struct {
+// SocialPublishPost represents a post to be published
+type SocialPublishPost struct {
 	ID             string     `json:"id"`
 	OrganizationID string     `json:"organization_id"`
 	AccountID      string     `json:"account_id"`

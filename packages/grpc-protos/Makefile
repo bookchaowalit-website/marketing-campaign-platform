@@ -1,8 +1,8 @@
 .PHONY: generate clean
 
 PROTO_DIR=.
-GO_OUTPUT=../../apps/api-go/pkg/grpc
-PYTHON_OUTPUT=../../apps/api-python/app/grpc
+GO_OUTPUT=../../api-go/pkg/grpc
+PYTHON_OUTPUT=../../api-python/app/grpc
 
 generate:
 	@echo "Generating Go gRPC code..."

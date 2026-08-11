@@ -21,7 +21,7 @@ func NewEmailCampaignHandler(svc *service.EmailCampaignService) *EmailCampaignHa
 // REQUEST STRUCTS
 // ===========================
 
-type CreateABTestRequest struct {
+type CreateEmailABTestRequest struct {
 	CampaignIDA       string `json:"campaign_id_a" binding:"required"`
 	CampaignIDB       string `json:"campaign_id_b" binding:"required"`
 	TestMetric        string `json:"test_metric"`
@@ -73,7 +73,7 @@ func (h *EmailCampaignHandler) GetCampaignAnalytics(c *gin.Context) {
 
 // CreateABTest handles POST /api/v1/email/ab-tests
 func (h *EmailCampaignHandler) CreateABTest(c *gin.Context) {
-	var req CreateABTestRequest
+	var req CreateEmailABTestRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

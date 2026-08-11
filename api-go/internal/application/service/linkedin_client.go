@@ -152,7 +152,7 @@ func (l *LinkedInClient) GetOrganizationPages(accessToken string) ([]struct {
 	}
 	for _, el := range result.Elements {
 		orgID := el.OrganizationalTarget
-		if idx := lastIndexOf(orgID, ':'); idx >= 0 && idx+1 < len(orgID) {
+		if idx := lastIndexOf(orgID, ":"); idx >= 0 && idx+1 < len(orgID) {
 			orgID = orgID[idx+1:]
 		}
 		name := el.OrgInfo.LocalizedName
@@ -236,7 +236,7 @@ func (l *LinkedInClient) PublishPost(accessToken, content string, mediaURLs []st
 
 	if location != "" {
 		// Extract post ID from URN (urn:li:share:123456789 -> 123456789)
-		if idx := lastIndexOf(location, ':'); idx >= 0 && idx+1 < len(location) {
+		if idx := lastIndexOf(location, ":"); idx >= 0 && idx+1 < len(location) {
 			return location[idx+1:], nil
 		}
 		return location, nil
@@ -302,7 +302,7 @@ func (l *LinkedInClient) SchedulePost(accessToken, content string, mediaURLs []s
 	}
 
 	if location != "" {
-		if idx := lastIndexOf(location, ':'); idx >= 0 && idx+1 < len(location) {
+		if idx := lastIndexOf(location, ":"); idx >= 0 && idx+1 < len(location) {
 			return location[idx+1:], nil
 		}
 		return location, nil

@@ -142,6 +142,26 @@ func (s *AffiliateService) GetAllAffiliates(ctx context.Context, organizationID 
 	return s.affiliateRepo.GetAllByOrganizationID(ctx, organizationID, limit, offset)
 }
 
+// GetAffiliatesByStatus returns affiliates filtered by status
+func (s *AffiliateService) GetAffiliatesByStatus(ctx context.Context, organizationID, status string, limit, offset int) ([]*domain.Affiliate, error) {
+	return s.affiliateRepo.GetByStatus(ctx, organizationID, status, limit, offset)
+}
+
+// UpdateAffiliate persists changes to an affiliate
+func (s *AffiliateService) UpdateAffiliate(ctx context.Context, affiliate *domain.Affiliate) error {
+	return s.affiliateRepo.Update(ctx, affiliate)
+}
+
+// DeleteAffiliateLink deletes an affiliate link
+func (s *AffiliateService) DeleteAffiliateLink(ctx context.Context, id string) error {
+	return s.linkRepo.Delete(ctx, id)
+}
+
+// GetCommissionsByStatus returns commissions filtered by status
+func (s *AffiliateService) GetCommissionsByStatus(ctx context.Context, affiliateID, status string, limit, offset int) ([]*domain.Commission, error) {
+	return s.commissionRepo.GetByStatus(ctx, affiliateID, status, limit, offset)
+}
+
 // ApproveAffiliate approves a pending affiliate
 func (s *AffiliateService) ApproveAffiliate(ctx context.Context, id, approvedBy string) error {
 	affiliate, err := s.affiliateRepo.GetByID(ctx, id)

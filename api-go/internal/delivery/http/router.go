@@ -166,7 +166,10 @@ func NewRouter(db *sql.DB) *Router {
 	}
 
 	// Initialize marketing features services
-	emailService := service.NewEmailMarketingService(db)
+	// Note: emailMarketingService manages lists/subscribers/campaigns (DB only);
+	// it does not implement domain.EmailService. Actual sending uses the real
+	// mailer (SendGrid/SES/stub) constructed above as `emailService`.
+	emailMarketingService := service.NewEmailMarketingService(db)
 	socialService := service.NewSocialMediaService(db)
 	landingService := service.NewLandingPageService(db)
 	automationService := service.NewAutomationService(db)
@@ -178,7 +181,7 @@ func NewRouter(db *sql.DB) *Router {
 	emailCampaignHandler := NewEmailCampaignHandler(emailCampaignSvc)
 
 	// Initialize marketing features handler
-	marketingHandler := NewMarketingFeaturesHandler(emailService, socialService, landingService, automationService, influencerService, reportingService)
+	marketingHandler := NewMarketingFeaturesHandler(emailMarketingService, socialService, landingService, automationService, influencerService, reportingService)
 
 	// Initialize budget service and handler
 	budgetService := service.NewBudgetService(budgetPeriodRepo, budgetAllocRepo, budgetTxnRepo, budgetAlertRepo)

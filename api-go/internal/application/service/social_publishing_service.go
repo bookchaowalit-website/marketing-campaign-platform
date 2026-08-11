@@ -34,9 +34,6 @@ func NewSocialPublishService(db *sql.DB, fbAppID, fbAppSecret string) *SocialPub
 		scheduler: NewSocialScheduler(),
 	}
 
-	// Start scheduler
-	svc.scheduler.Start()
-
 	return svc
 }
 
@@ -56,8 +53,8 @@ func (s *SocialPublishService) RegisterLinkedInClient(client *LinkedInClient) {
 }
 
 // ConnectAccount handles OAuth callback and stores account
-func (s *SocialPublishService) ConnectAccount(ctx context.Context, orgID, platform, code string) (*domain.SocialAccount, error) {
-	var client SocialPublishClient
+func (s *SocialPublishService) ConnectAccount(ctx context.Context, orgID, platform, code string) (*domain.SocialPublishAccount, error) {
+	var client domain.SocialPublishClient
 	switch platform {
 	case "facebook":
 		client = s.facebook
@@ -89,7 +86,7 @@ func (s *SocialPublishService) ConnectAccount(ctx context.Context, orgID, platfo
 	tokenExpiry := time.Now().Add(time.Duration(expiresIn) * time.Second)
 
 	// Store account
-	account := &domain.SocialAccount{
+	account := &domain.SocialPublishAccount{
 		ID:             uuid.New().String(),
 		OrganizationID: orgID,
 		Platform:       platform,
@@ -104,7 +101,7 @@ func (s *SocialPublishService) ConnectAccount(ctx context.Context, orgID, platfo
 	}
 
 	query := `
-		INSERT INTO social_accounts (id, organization_id, platform, platform_id, account_name, 
+		INSERT INTO social_publish_accounts (id, organization_id, platform, platform_id, account_name, 
 			access_token, refresh_token, token_expiry, status, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	`
@@ -119,11 +116,11 @@ func (s *SocialPublishService) ConnectAccount(ctx context.Context, orgID, platfo
 }
 
 // GetAccounts returns all connected accounts for an org
-func (s *SocialPublishService) GetAccounts(ctx context.Context, orgID string) ([]*domain.SocialAccount, error) {
+func (s *SocialPublishService) GetAccounts(ctx context.Context, orgID string) ([]*domain.SocialPublishAccount, error) {
 	query := `
 		SELECT id, organization_id, platform, platform_id, account_name, 
 			token_expiry, status, created_at, updated_at
-		FROM social_accounts
+		FROM social_publish_accounts
 		WHERE organization_id = $1 AND status = 'connected'
 		ORDER BY created_at DESC
 	`
@@ -133,9 +130,9 @@ func (s *SocialPublishService) GetAccounts(ctx context.Context, orgID string) ([
 	}
 	defer rows.Close()
 
-	var accounts []*domain.SocialAccount
+	var accounts []*domain.SocialPublishAccount
 	for rows.Next() {
-		var a domain.SocialAccount
+		var a domain.SocialPublishAccount
 		err := rows.Scan(&a.ID, &a.OrganizationID, &a.Platform, &a.PlatformID,
 			&a.AccountName, &a.TokenExpiry, &a.Status, &a.CreatedAt, &a.UpdatedAt)
 		if err != nil {
@@ -148,19 +145,19 @@ func (s *SocialPublishService) GetAccounts(ctx context.Context, orgID string) ([
 
 // DisconnectAccount disconnects a social account
 func (s *SocialPublishService) DisconnectAccount(ctx context.Context, accountID string) error {
-	query := `UPDATE social_accounts SET status = 'disconnected', updated_at = NOW() WHERE id = $1`
+	query := `UPDATE social_publish_accounts SET status = 'disconnected', updated_at = NOW() WHERE id = $1`
 	_, err := s.db.Exec(query, accountID)
 	return err
 }
 
 // CreatePost creates a new social post
-func (s *SocialPublishService) CreatePost(ctx context.Context, orgID, accountID, content string, mediaURLs []string, scheduledAt *time.Time) (*domain.SocialPost, error) {
+func (s *SocialPublishService) CreatePost(ctx context.Context, orgID, accountID, content string, mediaURLs []string, scheduledAt *time.Time) (*domain.SocialPublishPost, error) {
 	// Get account
-	var account domain.SocialAccount
+	var account domain.SocialPublishAccount
 	err := s.db.QueryRow(`
 		SELECT id, organization_id, platform, platform_id, account_name, access_token, 
 			refresh_token, token_expiry, status
-		FROM social_accounts WHERE id = $1 AND organization_id = $2
+		FROM social_publish_accounts WHERE id = $1 AND organization_id = $2
 	`, accountID, orgID).Scan(&account.ID, &account.OrganizationID, &account.Platform,
 		&account.PlatformID, &account.AccountName, &account.AccessToken, &account.RefreshToken,
 		&account.TokenExpiry, &account.Status)
@@ -168,7 +165,7 @@ func (s *SocialPublishService) CreatePost(ctx context.Context, orgID, accountID,
 		return nil, fmt.Errorf("account not found: %w", err)
 	}
 
-	post := &domain.SocialPost{
+	post := &domain.SocialPublishPost{
 		ID:             uuid.New().String(),
 		OrganizationID: orgID,
 		AccountID:      accountID,
@@ -186,7 +183,7 @@ func (s *SocialPublishService) CreatePost(ctx context.Context, orgID, accountID,
 	}
 
 	query := `
-		INSERT INTO social_posts (id, organization_id, account_id, content, media_urls, 
+		INSERT INTO social_publish_posts (id, organization_id, account_id, content, media_urls, 
 			platform, status, scheduled_at, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
@@ -208,13 +205,13 @@ func (s *SocialPublishService) CreatePost(ctx context.Context, orgID, accountID,
 
 // PublishPost publishes a post immediately
 func (s *SocialPublishService) PublishPost(ctx context.Context, postID string) error {
-	var post domain.SocialPost
-	var account domain.SocialAccount
+	var post domain.SocialPublishPost
+	var account domain.SocialPublishAccount
 	
 	err := s.db.QueryRow(`
 		SELECT sp.id, sp.organization_id, sp.account_id, sp.content, sp.media_urls, 
 			sp.platform, sp.status
-		FROM social_posts sp WHERE sp.id = $1
+		FROM social_publish_posts sp WHERE sp.id = $1
 	`, postID).Scan(&post.ID, &post.OrganizationID, &post.AccountID, &post.Content,
 		&post.MediaURLs, &post.Platform, &post.Status)
 	if err != nil {
@@ -223,7 +220,7 @@ func (s *SocialPublishService) PublishPost(ctx context.Context, postID string) e
 
 	err = s.db.QueryRow(`
 		SELECT access_token, refresh_token, token_expiry, platform_id
-		FROM social_accounts WHERE id = $1
+		FROM social_publish_accounts WHERE id = $1
 	`, post.AccountID).Scan(&account.AccessToken, &account.RefreshToken, &account.TokenExpiry, &account.PlatformID)
 	if err != nil {
 		return fmt.Errorf("account not found: %w", err)
@@ -241,7 +238,7 @@ func (s *SocialPublishService) PublishPost(ctx context.Context, postID string) e
 	}
 
 	// Publish
-	var platformClient SocialPublishClient
+	var platformClient domain.SocialPublishClient
 	switch post.Platform {
 	case "facebook":
 		platformClient = s.facebook
@@ -266,14 +263,14 @@ func (s *SocialPublishService) PublishPost(ctx context.Context, postID string) e
 	
 	if err != nil {
 		// Update post status to failed
-		s.db.Exec(`UPDATE social_posts SET status = 'failed', error_msg = $1, updated_at = NOW() WHERE id = $2`, err.Error(), postID)
+		s.db.Exec(`UPDATE social_publish_posts SET status = 'failed', error_msg = $1, updated_at = NOW() WHERE id = $2`, err.Error(), postID)
 		return fmt.Errorf("publish failed: %w", err)
 	}
 
 	// Update post status
 	now := time.Now()
 	_, err = s.db.Exec(`
-		UPDATE social_posts 
+		UPDATE social_publish_posts 
 		SET status = 'published', platform_post_id = $1, published_at = $2, updated_at = NOW()
 		WHERE id = $3
 	`, platformPostID, now, postID)
@@ -285,7 +282,7 @@ func (s *SocialPublishService) PublishPost(ctx context.Context, postID string) e
 }
 
 func (s *SocialPublishService) refreshToken(platform, refreshToken string) (string, time.Time, error) {
-	var client SocialPublishClient
+	var client domain.SocialPublishClient
 	switch platform {
 	case "facebook":
 		client = s.facebook
@@ -311,26 +308,26 @@ func (s *SocialPublishService) refreshToken(platform, refreshToken string) (stri
 
 // GetPostAnalytics retrieves analytics for a post
 func (s *SocialPublishService) GetPostAnalytics(ctx context.Context, postID string) (*domain.SocialPostAnalytics, error) {
-	var post domain.SocialPost
-	var account domain.SocialAccount
+	var post domain.SocialPublishPost
+	var account domain.SocialPublishAccount
 	
 	err := s.db.QueryRow(`
-		SELECT platform, platform_post_id FROM social_posts WHERE id = $1 AND status = 'published'
+		SELECT platform, platform_post_id FROM social_publish_posts WHERE id = $1 AND status = 'published'
 	`, postID).Scan(&post.Platform, &post.PlatformPostID)
 	if err != nil {
 		return nil, fmt.Errorf("published post not found")
 	}
 
 	err = s.db.QueryRow(`
-		SELECT access_token FROM social_accounts WHERE id = (
-			SELECT account_id FROM social_posts WHERE id = $1
+		SELECT access_token FROM social_publish_accounts WHERE id = (
+			SELECT account_id FROM social_publish_posts WHERE id = $1
 		)
 	`, postID).Scan(&account.AccessToken)
 	if err != nil {
 		return nil, fmt.Errorf("account not found")
 	}
 
-	var platformClient SocialPublishClient
+	var platformClient domain.SocialPublishClient
 	switch post.Platform {
 	case "facebook":
 		platformClient = s.facebook
@@ -366,7 +363,7 @@ func (s *SocialPublishService) GetPostAnalytics(ctx context.Context, postID stri
 	}
 
 	query := `
-		INSERT INTO social_post_analytics (post_id, platform, impressions, reach, likes, 
+		INSERT INTO social_publish_post_analytics (post_id, platform, impressions, reach, likes, 
 			comments, shares, clicks, engagement_rate, fetched_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		ON CONFLICT (post_id) DO UPDATE SET
@@ -390,7 +387,7 @@ func (s *SocialPublishService) GetPostAnalytics(ctx context.Context, postID stri
 func (s *SocialPublishService) RefreshExpiredTokens(ctx context.Context) error {
 	query := `
 		SELECT id, platform, refresh_token 
-		FROM social_accounts 
+		FROM social_publish_accounts 
 		WHERE status = 'connected' 
 			AND token_expiry < NOW() + INTERVAL '24 hours'
 			AND refresh_token IS NOT NULL
@@ -416,7 +413,7 @@ func (s *SocialPublishService) RefreshExpiredTokens(ctx context.Context) error {
 		}
 
 		s.db.Exec(`
-			UPDATE social_accounts 
+			UPDATE social_publish_accounts 
 			SET access_token = $1, token_expiry = $2, updated_at = NOW()
 			WHERE id = $3
 		`, newToken, newExpiry, accountID)
@@ -428,9 +425,9 @@ func (s *SocialPublishService) RefreshExpiredTokens(ctx context.Context) error {
 }
 
 // GetPosts returns posts for an org
-func (s *SocialPublishService) GetPosts(ctx context.Context, orgID string, limit, offset int) ([]*domain.SocialPost, int, error) {
+func (s *SocialPublishService) GetPosts(ctx context.Context, orgID string, limit, offset int) ([]*domain.SocialPublishPost, int, error) {
 	var total int
-	err := s.db.QueryRow(`SELECT COUNT(*) FROM social_posts WHERE organization_id = $1`, orgID).Scan(&total)
+	err := s.db.QueryRow(`SELECT COUNT(*) FROM social_publish_posts WHERE organization_id = $1`, orgID).Scan(&total)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -439,7 +436,7 @@ func (s *SocialPublishService) GetPosts(ctx context.Context, orgID string, limit
 		SELECT id, organization_id, account_id, content, media_urls, hashtags,
 			platform, status, scheduled_at, published_at, platform_post_id, error_msg,
 			created_at, updated_at
-		FROM social_posts
+		FROM social_publish_posts
 		WHERE organization_id = $1
 		ORDER BY created_at DESC
 		LIMIT $2 OFFSET $3
@@ -450,9 +447,9 @@ func (s *SocialPublishService) GetPosts(ctx context.Context, orgID string, limit
 	}
 	defer rows.Close()
 
-	var posts []*domain.SocialPost
+	var posts []*domain.SocialPublishPost
 	for rows.Next() {
-		var p domain.SocialPost
+		var p domain.SocialPublishPost
 		err := rows.Scan(&p.ID, &p.OrganizationID, &p.AccountID, &p.Content, &p.MediaURLs,
 			&p.Hashtags, &p.Platform, &p.Status, &p.ScheduledAt, &p.PublishedAt,
 			&p.PlatformPostID, &p.ErrorMsg, &p.CreatedAt, &p.UpdatedAt)
@@ -466,12 +463,12 @@ func (s *SocialPublishService) GetPosts(ctx context.Context, orgID string, limit
 }
 
 // GetScheduledPosts returns scheduled posts
-func (s *SocialPublishService) GetScheduledPosts(ctx context.Context, orgID string) ([]*domain.SocialPost, error) {
+func (s *SocialPublishService) GetScheduledPosts(ctx context.Context, orgID string) ([]*domain.SocialPublishPost, error) {
 	query := `
 		SELECT id, organization_id, account_id, content, media_urls, hashtags,
 			platform, status, scheduled_at, published_at, platform_post_id, error_msg,
 			created_at, updated_at
-		FROM social_posts
+		FROM social_publish_posts
 		WHERE organization_id = $1 AND status = 'scheduled'
 		ORDER BY scheduled_at ASC
 	`
@@ -481,9 +478,9 @@ func (s *SocialPublishService) GetScheduledPosts(ctx context.Context, orgID stri
 	}
 	defer rows.Close()
 
-	var posts []*domain.SocialPost
+	var posts []*domain.SocialPublishPost
 	for rows.Next() {
-		var p domain.SocialPost
+		var p domain.SocialPublishPost
 		err := rows.Scan(&p.ID, &p.OrganizationID, &p.AccountID, &p.Content, &p.MediaURLs,
 			&p.Hashtags, &p.Platform, &p.Status, &p.ScheduledAt, &p.PublishedAt,
 			&p.PlatformPostID, &p.ErrorMsg, &p.CreatedAt, &p.UpdatedAt)
@@ -501,7 +498,7 @@ func (s *SocialPublishService) DeletePost(ctx context.Context, postID string) er
 	// Get post to check if it's published
 	var platform, platformPostID, accountID string
 	err := s.db.QueryRow(`
-		SELECT platform, platform_post_id, account_id FROM social_posts WHERE id = $1
+		SELECT platform, platform_post_id, account_id FROM social_publish_posts WHERE id = $1
 	`, postID).Scan(&platform, &platformPostID, &accountID)
 	if err != nil {
 		return fmt.Errorf("post not found")
@@ -510,10 +507,10 @@ func (s *SocialPublishService) DeletePost(ctx context.Context, postID string) er
 	// If published, try to delete from platform
 	if platformPostID != "" {
 		var accessToken string
-		s.db.QueryRow(`SELECT access_token FROM social_accounts WHERE id = $1`, accountID).Scan(&accessToken)
+		s.db.QueryRow(`SELECT access_token FROM social_publish_accounts WHERE id = $1`, accountID).Scan(&accessToken)
 		
 		if accessToken != "" {
-			var client SocialPublishClient
+			var client domain.SocialPublishClient
 			switch platform {
 			case "facebook":
 				client = s.facebook
@@ -533,7 +530,7 @@ func (s *SocialPublishService) DeletePost(ctx context.Context, postID string) er
 	}
 
 	// Delete from DB
-	_, err = s.db.Exec(`DELETE FROM social_posts WHERE id = $1`, postID)
+	_, err = s.db.Exec(`DELETE FROM social_publish_posts WHERE id = $1`, postID)
 	return err
 }
 

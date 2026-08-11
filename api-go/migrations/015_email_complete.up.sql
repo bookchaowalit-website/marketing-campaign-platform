@@ -65,10 +65,12 @@ CREATE INDEX IF NOT EXISTS idx_email_sends_campaign_status ON email_sends(campai
 -- ===========================
 -- TRIGGERS
 -- ===========================
-CREATE TRIGGER IF NOT EXISTS update_email_ab_tests_updated_at
+DROP TRIGGER IF EXISTS update_email_ab_tests_updated_at ON email_campaign_ab_tests;
+CREATE TRIGGER update_email_ab_tests_updated_at
     BEFORE UPDATE ON email_campaign_ab_tests
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER IF NOT EXISTS update_email_sends_updated_at
+DROP TRIGGER IF EXISTS update_email_sends_updated_at ON email_sends;
+CREATE TRIGGER update_email_sends_updated_at
     BEFORE UPDATE ON email_sends
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

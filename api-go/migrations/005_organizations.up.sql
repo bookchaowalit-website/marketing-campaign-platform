@@ -29,6 +29,12 @@ CREATE TABLE IF NOT EXISTS organizations (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Demo organization: referenced by a fixed ID elsewhere (affiliate and CRM
+-- seed data) but never actually created by any migration until now.
+INSERT INTO organizations (id, name, slug) VALUES
+('00000000-0000-0000-0000-000000000001', 'Demo Organization', 'demo')
+ON CONFLICT (id) DO NOTHING;
+
 -- =====================================================
 -- 2. ORGANIZATION MEMBERS
 -- =====================================================
