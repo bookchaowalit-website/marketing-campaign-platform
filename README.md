@@ -231,7 +231,7 @@ live server against it:
   401s without a token and succeeds with one → all 16 migrations apply
   cleanly to a fresh database → the previously-500ing campaigns endpoint
   now returns real data. `go build ./...` and `go vet ./...` both pass
-  clean; no tests exist in this service.
+  clean. Offline auth/campaign HTTP tests have since been added; see below.
 
 ### `api-python` (Python backend) — syntax-verified only
 
@@ -267,6 +267,38 @@ Python 3.11 (`pyenv`/Docker). No tests exist in this service either.
   (`node .next/standalone/server.js`, matching what the repo's own
   Dockerfile actually runs — `next start` alone logs a warning and isn't
   representative): all 12+ routes return 200, auth-gated pages render.
+
+## Go HTTP tests (offline)
+
+Use Go 1.25+ as required by `api-go/go.mod`. Generate the local gRPC bindings
+with the existing proto generation step above before checking the full Go
+module; `pkg/`, generated bindings and `go.sum` are currently ignored by this
+repository. Install/cache dependencies once, then run the checks offline:
+
+```bash
+cd api-go
+go mod download all
+GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go vet ./...
+GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go test ./... -count=1
+```
+
+`internal/delivery/http/auth_campaign_test.go` uses `httptest` requests against
+the real Gin handlers, application services, bcrypt/JWT logic and auth
+middleware. In-memory repositories and a channel-based email fake replace
+the database and mail provider. No running server, database, credentials or
+provider access is needed by the tests.
+
+Coverage includes registration and hashed-password/token persistence, login,
+authenticated campaign creation, malformed/invalid input, duplicate accounts,
+wrong credentials, inactive accounts, missing/tampered authentication, and
+repository write failures. The tests await the local verification-email
+handoff before sending the next request. These checks do not claim tenant
+isolation or change the documented demo-organization behavior.
+
+Verified on 2026-10-15 with Go 1.25.14: `go vet ./...` and the full `go test`
+command passed (7 top-level tests, 15 subtests). Mutation checks confirmed the
+tests fail if password hashing, password checking or campaign persistence is
+broken; production files were restored before the final full checks.
 
 ## 📄 License
 
