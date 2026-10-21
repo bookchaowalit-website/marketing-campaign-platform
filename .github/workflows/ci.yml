@@ -1,0 +1,58 @@
+# CI + security baseline (DevSecOps Phase 1). Public repository: GitHub-hosted runners.
+# CI never deploys: this monorepo has no production deployment (see specs/001-next16-ci-sentry/spec.md).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    uses: bookchaowalit/platform-ci-workflows/.github/workflows/ci-node.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
+    with:
+      working-directory: web
+      node-version: "22"
+      require-tests: true
+      build-command: npm run build
+
+  api-python:
+    uses: bookchaowalit/platform-ci-workflows/.github/workflows/ci-python.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
+    with:
+      working-directory: api-python
+      python-version: "3.11" # pyproject: python ^3.11; numpy 1.26 has no 3.13 wheels
+      # requirements.txt is generated from requirements.in (uv pip compile) and is what the Dockerfile installs.
+      install-command: uv pip install -r requirements.txt
+      # Legacy code is not Ruff-clean yet; gate on syntax errors and undefined names
+      # (this caught a missing import in migrations/env.py).
+      lint-command: uvx ruff check --select E9,F63,F7,F82 .
+      format-check: false
+      test-command: python -m pytest -q tests && python -m compileall -q app migrations
+
+  # The shared workflows have no Go job yet, so the Go API keeps its own.
+  api-go:
+    name: api-go (build, vet, test)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: api-go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: api-go/go.mod
+          cache-dependency-path: api-go/go.sum
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test ./...
+
+  security:
+    uses: bookchaowalit/platform-ci-workflows/.github/workflows/security.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
