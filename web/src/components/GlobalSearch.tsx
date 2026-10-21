@@ -143,6 +143,8 @@ export default function GlobalSearch() {
 
   useEffect(() => {
     if (open) {
+      // Reset the search each time the shared dialog opens (open state lives in SearchContext).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('')
       setSelectedIndex(-1)
       // Focus input after dialog opens

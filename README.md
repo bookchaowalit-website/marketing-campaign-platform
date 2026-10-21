@@ -8,7 +8,7 @@ A comprehensive Marketing SaaS platform built with a polyglot microservices arch
 ## 🚀 Tech Stack
 
 ### Frontend
-- **Next.js 14** - React framework with App Router
+- **Next.js 16** - React framework with App Router (React 19)
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
 - **Material-UI** - Component library

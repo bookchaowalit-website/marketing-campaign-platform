@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   Box,
@@ -30,23 +30,16 @@ export default function ResetPasswordPage() {
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams()
-  const [token, setToken] = useState<string | null>(null)
+  const token = searchParams?.get('token') ?? null
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(
+    token ? null : 'Invalid or missing reset token. Please request a new password reset link.'
+  )
   const [success, setSuccess] = useState(false)
-
-  useEffect(() => {
-    const t = searchParams?.get('token')
-    if (t) {
-      setToken(t)
-    } else {
-      setError('Invalid or missing reset token. Please request a new password reset link.')
-    }
-  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

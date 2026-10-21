@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { affiliateApi } from '@/lib/affiliate-api'
-import { Box, Card, CardContent, Typography, Grid, Paper, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Skeleton, Button, Tabs, Tab, LinearProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, TableSortLabel } from '@mui/material'
+import { Box, Card, CardContent, Typography, Grid, Paper, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Skeleton, Button, Tabs, Tab, LinearProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, TableSortLabel, alpha } from '@mui/material'
+import { paletteColor } from '@/lib/palette'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import BlockIcon from '@mui/icons-material/Block'
@@ -205,7 +206,7 @@ export default function AffiliatesPage() {
                     <Box sx={{
                       p: 1,
                       borderRadius: 2,
-                      bgcolor: `${stat.color}20`,
+                      bgcolor: (theme) => alpha(paletteColor(theme.palette, stat.color), 0.125),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'

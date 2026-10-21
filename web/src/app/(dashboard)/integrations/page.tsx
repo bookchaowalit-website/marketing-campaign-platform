@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { externalAffiliateApi } from '@/lib/external-affiliate-api'
-import { Box, Card, CardContent, Typography, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Skeleton, Button, Tabs, Tab, LinearProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, Menu, MenuItem, ListItemIcon, ListItemText, Divider, TableSortLabel } from '@mui/material'
+import { Box, Card, CardContent, Typography, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Skeleton, Button, Tabs, Tab, LinearProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, Menu, MenuItem, ListItemIcon, ListItemText, Divider, TableSortLabel, alpha } from '@mui/material'
+import { paletteColor } from '@/lib/palette'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import LinkIcon from '@mui/icons-material/Link'
 import AddIcon from '@mui/icons-material/Add'
@@ -254,7 +255,7 @@ export default function IntegrationsPage() {
                     <Box sx={{
                       p: 1,
                       borderRadius: 2,
-                      bgcolor: `${stat.color}20`,
+                      bgcolor: (theme) => alpha(paletteColor(theme.palette, stat.color), 0.125),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'

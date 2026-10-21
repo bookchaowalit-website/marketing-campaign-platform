@@ -21,7 +21,7 @@ protos.
 ## Architecture (Verified layout)
 
 ```text
-web/                 Next.js 14 App Router dashboard
+web/                 Next.js 16 App Router dashboard (React 19, MUI 5)
 api-go/              Go hexagonal HTTP + gRPC core
 api-python/          FastAPI analytics / SEO research
 packages/grpc-protos Shared protobufs

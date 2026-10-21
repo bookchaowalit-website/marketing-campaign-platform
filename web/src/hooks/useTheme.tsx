@@ -22,6 +22,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Check for saved theme preference
     const savedMode = localStorage.getItem('themeMode') as ThemeMode
     if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
+      // localStorage and matchMedia exist only after hydration; reading them in the initial
+      // state would make the server and client markup differ.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode(savedMode)
     } else {
       // Check system preference

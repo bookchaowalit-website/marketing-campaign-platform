@@ -16,6 +16,7 @@ import { CustomBarChart, CustomPieChart, CustomAreaChart } from '@/components/ch
 import { ConfirmDialog, useConfirmDialog } from '@/components/ConfirmDialog'
 import { useRouter } from 'next/navigation'
 import { formatCurrency, formatNumber } from '@/lib/utils'
+import { paletteColor } from '@/lib/palette'
 
 interface DashboardData {
   total_campaigns: number
@@ -200,7 +201,7 @@ export default function DashboardPage() {
                     <Box sx={{
                       p: 1,
                       borderRadius: 2,
-                      bgcolor: alpha(stat.color, 0.15),
+                      bgcolor: (theme) => alpha(paletteColor(theme.palette, stat.color), 0.15),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'

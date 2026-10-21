@@ -23,27 +23,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    // Check for existing token on mount
-    const storedToken = localStorage.getItem('token')
-    const storedRefreshToken = localStorage.getItem('refresh_token')
-    const storedUser = localStorage.getItem('user')
-
-    if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
-
-      // Try to refresh token if it's close to expiring
-      if (storedRefreshToken) {
-        refreshAuthToken(storedRefreshToken).catch(() => {
-          // Refresh failed, clear auth
-          clearAuth()
-        })
-      }
-    }
-    setIsLoading(false)
-  }, [])
-
   const clearAuth = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('refresh_token')
@@ -63,6 +42,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error
     }
   }
+
+  useEffect(() => {
+    // Check for existing token on mount
+    const storedToken = localStorage.getItem('token')
+    const storedRefreshToken = localStorage.getItem('refresh_token')
+    const storedUser = localStorage.getItem('user')
+
+    if (storedToken && storedUser) {
+      // Browser storage is only readable after hydration, so the session is restored here.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setToken(storedToken)
+      setUser(JSON.parse(storedUser))
+
+      // Try to refresh token if it's close to expiring
+      if (storedRefreshToken) {
+        refreshAuthToken(storedRefreshToken).catch(() => {
+          // Refresh failed, clear auth
+          clearAuth()
+        })
+      }
+    }
+    setIsLoading(false)
+  }, [])
 
   const login = async (email: string, password: string) => {
     const data = await authApi.login(email, password)

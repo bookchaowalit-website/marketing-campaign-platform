@@ -1,3 +1,4 @@
+import { toCSV } from './csv'
 import { MarketingCampaign, CompetitorAnalysis, ABTest, SEOMetrics } from '@/types/marketing'
 
 export function exportToCSV(
@@ -6,32 +7,8 @@ export function exportToCSV(
   columns?: string[],
   onProgress?: (progress: number) => void
 ): void {
-  if (!data || data.length === 0) {
-    throw new Error('No data to export')
-  }
-
-  const headers = columns && columns.length > 0 ? columns : Object.keys(data[0])
-  const total = data.length
-  const rows: string[] = []
-  rows.push(headers.join(','))
-
-  for (let i = 0; i < total; i++) {
-    const row = data[i]
-    const values = headers.map(header => {
-      const value = row[header]
-      if (typeof value === 'string' && value.includes(',')) {
-        return `"${value}"`
-      }
-      return value ?? ''
-    }).join(',')
-    rows.push(values)
-
-    if (onProgress) {
-      onProgress(i + 1)
-    }
-  }
-
-  const csvContent = rows.join('\n')
+  const csvContent = toCSV(data, columns)
+  if (onProgress) for (let i = 1; i <= data.length; i++) onProgress(i)
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
