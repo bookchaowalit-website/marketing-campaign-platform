@@ -36,7 +36,6 @@ vendor/
 *.exe
 *.test
 *.out
-go.sum
 
 # Python
 __pycache__/

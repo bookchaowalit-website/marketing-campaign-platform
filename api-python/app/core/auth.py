@@ -1,7 +1,7 @@
 """Authentication middleware and utilities for Python API."""
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
+import jwt
 from typing import Optional
 from app.core.config import settings
 
@@ -23,7 +23,7 @@ def verify_token(token: str) -> Optional[dict]:
             algorithms=[settings.ALGORITHM]
         )
         return payload
-    except JWTError:
+    except jwt.InvalidTokenError:
         return None
 
 

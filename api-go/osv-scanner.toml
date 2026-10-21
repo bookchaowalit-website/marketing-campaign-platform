@@ -1,0 +1,17 @@
+# Reviewed OSV-Scanner exceptions. Each entry needs a reason and an expiry.
+# govulncheck (2026-10-22) reports that the code does not call any of these.
+
+[[IgnoredVulns]]
+id = "GO-2022-0635"
+ignoreUntil = 2027-01-17T00:00:00Z
+reason = "aws-sdk-go v1 s3crypto client (no fix in v1). This service imports only aws, aws/session and service/ses. Migrating to aws-sdk-go-v2 removes it."
+
+[[IgnoredVulns]]
+id = "GO-2022-0646"
+ignoreUntil = 2027-01-17T00:00:00Z
+reason = "aws-sdk-go v1 s3crypto client (no fix in v1). This service imports only aws, aws/session and service/ses. Migrating to aws-sdk-go-v2 removes it."
+
+[[IgnoredVulns]]
+id = "GO-2026-5932"
+ignoreUntil = 2027-01-17T00:00:00Z
+reason = "golang.org/x/crypto/openpgp is deprecated with no fix. Nothing in this module imports golang.org/x/crypto/openpgp."
