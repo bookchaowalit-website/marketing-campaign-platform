@@ -32,6 +32,7 @@ Thumbs.db
 # Go
 bin/
 pkg/
+!api-go/pkg/
 vendor/
 *.exe
 *.test
@@ -53,6 +54,7 @@ ENV/
 
 # gRPC
 *.pb.go
+!api-go/pkg/grpc/*.pb.go
 *_pb2.py
 *_pb2_grpc.py
 
