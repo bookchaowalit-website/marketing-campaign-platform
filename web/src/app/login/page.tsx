@@ -89,11 +89,6 @@ export default function LoginPage() {
             </Typography>
           </Box>
 
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
-              Demo credentials: demo@example.com / test123
-            </Typography>
-          </Box>
         </CardContent>
       </Card>
     </Box>

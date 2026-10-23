@@ -75,38 +75,6 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
         }
-        .divider {
-            text-align: center;
-            margin: 24px 0;
-            color: #9ca3af;
-            position: relative;
-        }
-        .divider::before, .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 45%;
-            height: 1px;
-            background: #e5e7eb;
-        }
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
-        .demo-credentials {
-            background: #f0fdf4;
-            padding: 16px;
-            border-radius: 8px;
-            border-left: 4px solid #10b981;
-        }
-        .demo-credentials h3 {
-            color: #065f46;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        .demo-credentials p {
-            color: #047857;
-            font-size: 0.85rem;
-            margin: 4px 0;
-        }
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
@@ -138,7 +106,7 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="demo@example.com" required>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
             </div>
 
             <div class="form-group">
@@ -148,14 +116,6 @@
 
             <button type="submit" class="btn-login">Sign In</button>
         </form>
-
-        <div class="divider">or</div>
-
-        <div class="demo-credentials">
-            <h3>🎯 Demo Credentials</h3>
-            <p><strong>Email:</strong> demo@example.com</p>
-            <p><strong>Password:</strong> demo123</p>
-        </div>
     </div>
 
     <script>
@@ -167,27 +127,12 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
             const alert = document.getElementById('alert');
 
-            // Demo login (in production, call actual API)
-            if (email === 'demo@example.com' && password === 'demo123') {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('user', JSON.stringify({ email, name: 'Demo User' }));
-                
-                alert.className = 'alert alert-success';
-                alert.textContent = 'Login successful! Redirecting...';
-                alert.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                alert.className = 'alert alert-error';
-                alert.textContent = 'Invalid credentials. Please use demo@example.com / demo123';
-                alert.style.display = 'block';
-            }
+            // Static prototype: sign-in is handled by the app at /login.
+            alert.className = 'alert alert-error';
+            alert.textContent = 'This static prototype has no sign-in. Please use the app at /login.';
+            alert.style.display = 'block';
         });
     </script>
 </body>
