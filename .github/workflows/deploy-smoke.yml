@@ -1,0 +1,49 @@
+# Deploy verification (ADR-0003, D3). Vercel deploys main through its Git integration and reports a
+# GitHub deployment status; when the Production deployment succeeds, smoke-check the live site and
+# check that it runs the deployed commit. Read-only: no secrets, no deploy rights.
+# This repository has no production host yet (marketing.bookchaowalit.com serves
+# marketing-bookmarketing-web). When one is connected, set the repository variable PRODUCTION_URL;
+# until then a manual run fails on purpose.
+name: Deploy smoke
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-smoke
+  cancel-in-progress: true
+
+jobs:
+  deploy-smoke:
+    name: Production smoke (vars.PRODUCTION_URL)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require a production URL
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          if [ -z "$PRODUCTION_URL" ]; then
+            echo "::error::No production URL: set the repository variable PRODUCTION_URL once this app has its own host."
+            exit 1
+          fi
+
+      - name: Smoke-check the production site
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+          # The deployed commit; a manual run checks that production runs the head of the branch.
+          EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
+        run: bash scripts/deploy-smoke.sh "$PRODUCTION_URL" "$EXPECTED_SHA"
