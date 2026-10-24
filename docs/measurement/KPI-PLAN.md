@@ -47,3 +47,9 @@ needed. No personal data leaves the database; reports aggregate by organisation.
 ## Instrumentation verification (before G10)
 
 Not started: there is no environment with users. Checks 1–7 of the template run after the first deployment.
+
+## Review (2026-10-24): changes requested
+
+Checker: independent Claude reviewer subagent (`solo:solo-reviewer`, Sonnet, read-only, no maker context). Status unchanged until fixed.
+
+- Gap: KPI-G-01 (Sentry errors per 1,000 sessions) has no session source while the plan says no client analytics; KPI-L-02 relies on unspecified 'module tables'.
