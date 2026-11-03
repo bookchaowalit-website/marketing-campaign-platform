@@ -37,7 +37,7 @@ Sources: `api-go/internal/delivery/http/router.go`, `api-go/internal/delivery/ht
 
 ข้อสังเกตจากโค้ด
 
-- Classic campaigns ใช้ org คงที่ `00000000-0000-0000-0000-000000000001` (`defaultOrganizationID`) ส่วน unified campaigns, SMS, social, approval อ่าน `c.GetString("organization_id")` ซึ่ง `AuthMiddleware` ไม่เคย set: ได้ `""` เสมอ (`PRODUCT.md` §Trust boundaries ระบุเป็น documented limitation)
+- Classic campaigns ใช้ org คงที่ `00000000-0000-0000-0000-000000000001` (`defaultOrganizationID`) unified campaigns อ่าน `c.GetString("organization_id")` ซึ่ง `AuthMiddleware` ไม่เคย set: ได้ `""` เสมอ; SMS / social (`sms_handler.go`, `social_handler.go`) แทนค่าว่างด้วย demo org และ approval (`approval_handler.go`) ใช้ `defaultOrganizationID` ตรง ๆ จึงไม่ fail แต่ข้อมูลทุกคนปนอยู่ใน demo org เดียว (`PRODUCT.md` §Trust boundaries ระบุเป็น documented limitation)
 - Approve/reject unified campaign ไม่มี role check: user ที่ login แล้วทุกคนเรียกได้ (`router.go` group `unified` ไม่มี `AdminOnlyMiddleware`)
 - Approval workflow แยก (`/approval/requests/:id/respond`) ตัดสินผลตาม `approval_order` `any` / `sequential` / `parallel` (`approval_service.go`) แต่ไม่ผูกกับ `unified-campaigns/:id/submit` (สอง flow ไม่เรียกกัน)
 - ตัวเลข analytics ทั้งหมดใน `analytics_service.py` มาจาก `random` ไม่ได้อ่าน DB

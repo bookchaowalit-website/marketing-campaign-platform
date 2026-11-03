@@ -20,7 +20,8 @@ Dashboard ต้องเรียกสอง API ด้วย session เด�
 - Go `ValidateToken` ไม่ได้จำกัด signing method ด้วย `jwt.WithValidMethods` (คืน HMAC secret ให้ทุก alg) ต่างจากฝั่ง Python ที่ล็อก HS256
 - JWT ไม่มี `organization_id`: tenancy ไม่ถูกบังคับ (`PRODUCT.md` §Trust boundaries)
 - Token ใน `localStorage` อ่านได้จาก script ใดก็ได้ในหน้า (XSS exposure)
-- Rate limiter และ blacklist check อยู่ใน process เดียว: ไม่แชร์ข้าม instance
+- Rate limiter อยู่ใน memory ของ process: ไม่แชร์ข้าม instance และหายเมื่อ restart
+- Logout blacklist เก็บใน PostgreSQL ตาราง `token_blacklist` (`api-go/internal/infrastructure/repository/auth_repository.go`): แชร์ข้าม instance ที่ใช้ DB เดียวกันและอยู่รอดข้าม restart; แต่ทุก authenticated request ต้อง query DB หนึ่งครั้ง
 
 ## Evidence
 

@@ -42,7 +42,7 @@ repo นี้คือ Tier A interview flagship: polyglot monorepo (`web/` Nex
 ## Findings worth the owner's attention
 
 - ไม่มี deployment; `bookmarketing.bookchaowalit.com` ตอนนี้ CNAME ไป Vercel แต่ TLS handshake fail (ดู 16)
-- Tenancy: JWT ไม่มี `organization_id` → unified campaigns / SMS / social / approval ได้ `""` (insert UUID fail); classic campaigns ใช้ demo org ร่วมกันและไม่เช็ก owner บน get/update/delete (ดู 09, 11, 13)
+- Tenancy: JWT ไม่มี `organization_id` → เฉพาะ unified campaigns ได้ `""` (insert UUID fail); SMS / social / ads fallback เป็น demo org `00000000-0000-0000-0000-000000000001` และ approval / affiliate / classic campaigns ใช้ `defaultOrganizationID` ตรง ๆ — ผู้ใช้ทุกคนจึงเห็นและแก้ข้อมูล demo org ชุดเดียวกัน; classic campaigns ไม่เช็ก owner บน get/update/delete (ดู 09, 11, 13)
 - `web/src/lib/affiliate-api.ts`, `external-affiliate-api.ts`, `marketing-features-api.ts` ต่อ path เป็น `/api/go/api/v1/...` → Go `/api/api/v1/...` (น่าจะ 404 ทั้งหน้า `/affiliates`, `/integrations`, `/marketing`) (ดู 03)
 - Public `/api/v1/email/track/click` เป็น open redirect; gRPC เปิดแบบ insecure + reflection; seed admin `admin@marketing.com` ยังอยู่ใน `001_init.up.sql`; stub mailer log token reset/verify (ดู 13)
 - `email_campaigns` เขียน status `failed` ที่ไม่อยู่ใน CHECK; SMS campaign ค้าง `sending` เมื่อไม่มี list (ดู 11)
