@@ -1,0 +1,18 @@
+{
+  "floor": "1.0.0",
+  "public": true,
+  "target": {
+    "serve": ["npx", "--no-install", "next", "start", "-p", "4173"],
+    "url": "http://localhost:4173",
+    "timeoutSeconds": 120
+  },
+  "routes": [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    { "path": "/no-such-page/", "status": 404 }
+  ],
+  "widths": [320, 375, 390, 768, 1440],
+  "waivers": []
+}

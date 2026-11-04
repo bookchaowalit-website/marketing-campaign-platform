@@ -34,29 +34,38 @@ const lightThemeOptions: ThemeOptions = {
     },
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    // Latin first (Inter, next/font on <html>), then Noto Sans Thai for Thai text (design floor).
+    fontFamily: 'var(--font-inter), var(--font-noto-sans-thai), "Helvetica", "Arial", sans-serif',
+    // Thai line-height floor: body >= 1.6 (allVariants applies to every variant, headings below).
+    allVariants: { lineHeight: 1.6 },
     h1: {
       fontSize: '2.5rem',
+      lineHeight: 1.35,
       fontWeight: 700,
     },
     h2: {
       fontSize: '2rem',
+      lineHeight: 1.35,
       fontWeight: 700,
     },
     h3: {
       fontSize: '1.5rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h4: {
       fontSize: '1.25rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h5: {
       fontSize: '1rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h6: {
       fontSize: '0.875rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
   },
@@ -132,29 +141,38 @@ const darkThemeOptions: ThemeOptions = {
     },
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    // Latin first (Inter, next/font on <html>), then Noto Sans Thai for Thai text (design floor).
+    fontFamily: 'var(--font-inter), var(--font-noto-sans-thai), "Helvetica", "Arial", sans-serif',
+    // Thai line-height floor: body >= 1.6 (allVariants applies to every variant, headings below).
+    allVariants: { lineHeight: 1.6 },
     h1: {
       fontSize: '2.5rem',
+      lineHeight: 1.35,
       fontWeight: 700,
     },
     h2: {
       fontSize: '2rem',
+      lineHeight: 1.35,
       fontWeight: 700,
     },
     h3: {
       fontSize: '1.5rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h4: {
       fontSize: '1.25rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h5: {
       fontSize: '1rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
     h6: {
       fontSize: '0.875rem',
+      lineHeight: 1.35,
       fontWeight: 600,
     },
   },

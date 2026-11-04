@@ -1,3 +1,8 @@
+/* Order matters (ADR-0007 README): vendored tokens first, then Tailwind, then app values.
+ * Tailwind v3 has no native cascade layers, so the floor file is imported without layer(base). */
+@import "../styles/design-floor/tokens.css";
+@import "../styles/app-theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,12 +40,21 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: var(--font-sans);
+  line-height: var(--leading-thai);
 }
 
 /* Fix for MUI drawer */
 .MuiDrawer-paper {
   border-right: none !important;
+}
+
+/* MUI sets outline: 0 on text inputs (.mui-xxx:focus) and draws its own state. The doubled class
+ * raises specificity above that rule, so the floor focus ring (2.4.7) shows on these controls too. */
+.MuiInputBase-input.MuiInputBase-input:focus-visible,
+.MuiButtonBase-root.MuiButtonBase-root:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* Custom scrollbar */
@@ -70,25 +84,23 @@ body {
   }
 }
 
-/* Focus visible for accessibility */
-*:focus-visible {
-  outline: 2px solid #1976d2;
-  outline-offset: 2px;
-}
-
-/* Skip to main content link */
-.skip-to-main {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: #1976d2;
-  color: white;
-  padding: 8px 16px;
-  z-index: 10000;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.skip-to-main:focus {
-  top: 0;
+/* Skip link: first stop on every page, targets #main-content (2.4.1). Hidden above the viewport
+ * until it takes focus. */
+@layer components {
+  .skip-link {
+    position: fixed;
+    z-index: 1500;
+    top: 8px;
+    left: 8px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    color: var(--color-accent-fg);
+    background: var(--color-accent);
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-160%);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
 }

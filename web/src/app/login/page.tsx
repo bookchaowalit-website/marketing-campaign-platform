@@ -28,6 +28,8 @@ export default function LoginPage() {
 
   return (
     <Box
+      component="main"
+      id="main-content"
       sx={{
         minHeight: '100vh',
         display: 'flex',

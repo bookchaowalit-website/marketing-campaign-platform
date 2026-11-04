@@ -1,0 +1,18 @@
+/* App values for the ADR-0007 design floor. Imported after the vendored tokens.css, so these
+ * override its light defaults. Dark values come from tokens.css (:root[data-theme="dark"]),
+ * which ThemeProvider sets from the app's own light/dark toggle. */
+:root {
+  --color-bg: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-fg: #000000;
+  --color-fg-muted: #555555;
+  --color-accent: #2563eb;
+  --color-accent-fg: #ffffff;
+  --color-border: #767676;
+  --color-focus: #2563eb;
+  --color-danger: #d32f2f;
+  --color-success: #2e7d32;
+
+  /* Latin-first stack: Inter for Latin, Noto Sans Thai (next/font, self-hosted) for Thai. */
+  --font-sans: var(--font-inter), var(--font-noto-sans-thai), system-ui, sans-serif;
+}

@@ -44,6 +44,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <Box
+      component="main"
+      id="main-content"
       sx={{
         minHeight: '100vh',
         display: 'flex',
@@ -112,7 +114,11 @@ export default function ForgotPasswordPage() {
 
         <Typography variant="body2" textAlign="center">
           Remember your password?{' '}
-          <MuiLink component={Link} href="/login" sx={{ fontWeight: 'medium' }}>
+          <MuiLink
+            component={Link}
+            href="/login"
+            sx={{ fontWeight: 'medium', display: 'inline-flex', alignItems: 'center', minHeight: 24 }}
+          >
             Back to Login
           </MuiLink>
         </Typography>

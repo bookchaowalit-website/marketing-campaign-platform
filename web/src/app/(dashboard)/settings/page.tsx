@@ -582,7 +582,7 @@ function PreferencesTab() {
                 startAdornment={<LanguageIcon sx={{ mr: 1, color: 'text.secondary' }} />}
               >
                 <MenuItem value="en">English</MenuItem>
-                <MenuItem value="th">Thai (ภาษาไทย)</MenuItem>
+                <MenuItem value="th">Thai (<span lang="th">ภาษาไทย</span>)</MenuItem>
                 <MenuItem value="ja">Japanese (日本語)</MenuItem>
                 <MenuItem value="zh">Chinese (中文)</MenuItem>
                 <MenuItem value="vi">Vietnamese (Tiếng Việt)</MenuItem>

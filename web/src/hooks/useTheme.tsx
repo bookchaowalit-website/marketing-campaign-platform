@@ -46,6 +46,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const theme = mode === 'light' ? lightTheme : darkTheme
 
+  // The design floor's dark tokens (tokens.css) switch on data-theme, not on MUI's palette.
+  useEffect(() => {
+    document.documentElement.dataset.theme = mode
+  }, [mode])
+
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme, setMode: handleSetMode }}>
       <MuiThemeProvider theme={theme}>

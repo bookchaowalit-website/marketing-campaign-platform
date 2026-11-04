@@ -7,6 +7,8 @@ import SearchOffIcon from '@mui/icons-material/SearchOff'
 export default function NotFound() {
   return (
     <Box
+      component="main"
+      id="main-content"
       sx={{
         minHeight: '100vh',
         display: 'flex',

@@ -73,6 +73,8 @@ function ResetPasswordForm() {
 
   return (
     <Box
+      component="main"
+      id="main-content"
       sx={{
         minHeight: '100vh',
         display: 'flex',
@@ -141,6 +143,7 @@ function ResetPasswordForm() {
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -162,6 +165,7 @@ function ResetPasswordForm() {
                     <IconButton
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       edge="end"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -183,7 +187,11 @@ function ResetPasswordForm() {
         )}
 
         <Typography variant="body2" textAlign="center">
-          <MuiLink component={Link} href="/login" sx={{ fontWeight: 'medium' }}>
+          <MuiLink
+            component={Link}
+            href="/login"
+            sx={{ fontWeight: 'medium', display: 'inline-flex', alignItems: 'center', minHeight: 24 }}
+          >
             Back to Login
           </MuiLink>
         </Typography>

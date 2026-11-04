@@ -54,42 +54,6 @@ export default function DashboardLayout({
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Skip to main content link for accessibility */}
-      <a
-        href="#main-content"
-        className="skip-to-main"
-        style={{
-          position: 'absolute',
-          left: '-9999px',
-          top: 'auto',
-          width: '1px',
-          height: '1px',
-          overflow: 'hidden',
-          zIndex: 99999,
-          padding: '12px 24px',
-          background: '#1976d2',
-          color: '#fff',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          borderRadius: '4px',
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.left = '16px'
-          e.currentTarget.style.top = '16px'
-          e.currentTarget.style.width = 'auto'
-          e.currentTarget.style.height = 'auto'
-          e.currentTarget.style.overflow = 'visible'
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.left = '-9999px'
-          e.currentTarget.style.top = 'auto'
-          e.currentTarget.style.width = '1px'
-          e.currentTarget.style.height = '1px'
-          e.currentTarget.style.overflow = 'hidden'
-        }}
-      >
-        Skip to main content
-      </a>
       {/* Mobile App Bar */}
       {isMobile && (
         <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
