@@ -107,7 +107,7 @@ numpy==1.26.4
     #   scipy
 oauthlib==4.0.1
     # via requests-oauthlib
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
     # via
     #   fastapi
     #   google-api-core
