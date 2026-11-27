@@ -1,7 +1,9 @@
 # 01 — Business process (As-Is / To-Be)
 
 BookMarketing (repo `marketing-campaign-platform`) คือ dashboard รวมงาน marketing สำหรับทีมเล็กหรือ solopreneur (`PRODUCT.md` §Who this is for)
-ณ `origin/main` `a4061e5` ยัง **ไม่มี deployment** ใดเลย (`specs/001-next16-ci-sentry/spec.md` §5) ภาพ As-Is จึงเป็น process ที่โค้ดรองรับเมื่อรันในเครื่อง (`npm run dev` / `docker/docker-compose.yml`) ไม่ใช่การใช้งานจริงของลูกค้า
+ยัง **ไม่มี deployment** ใดเลย (`specs/001-next16-ci-sentry/spec.md` §5) ภาพ As-Is จึงเป็น process ที่โค้ดรองรับเมื่อรันในเครื่อง (`npm run dev` / `docker/docker-compose.yml`) ไม่ใช่การใช้งานจริงของลูกค้า
+
+Last reviewed: 2026-11-27 · commit `6c9d03e`
 
 ## As-Is — campaign lifecycle ที่โค้ดรองรับวันนี้
 
@@ -59,8 +61,19 @@ flowchart TD
 
 Sources: `PRODUCT.md` §Next improvements, §Trust boundaries, `specs/001-next16-ci-sentry/spec.md` §5 Known gaps
 
+## Gap
+
+| ID | As-Is → To-Be | Status | Owner | Evidence |
+|---|---|---|---|---|
+| G1 | org ใน handler เป็น demo org คงที่หรือ `""` (`AuthMiddleware` ไม่ set `organization_id`) → org จริงจาก JWT claim/header | decide | owner | `PRODUCT.md` Next improvements ข้อ 1 (ต้องตัดสินก่อนว่า registration สร้าง org หรือไม่) |
+| G2 | smoke test auth + campaigns + SEO unwrap มีน้อย (Go มีไฟล์ test เดียว) → `go test` และ vitest smoke ครอบคลุม | doing | claude | `PRODUCT.md` Next improvements ข้อ 2; `web/tests/` (health, csv, sentry เท่านั้น) |
+| G3 | api-python ใช้ Python 3.11 Docker target | done | claude | `api-python/Dockerfile` (`python:3.11-slim`) |
+| G4 | dashboard ยังไม่ deploy → deploy หรือแก้ registry `live_url` | decide | owner | `specs/001-next16-ci-sentry/spec.md` §5 |
+| G5 | classic `campaigns` กับ unified campaigns แยกกัน, approval workflow แยกจาก unified submit → ไม่มี To-Be ที่เขียนไว้ | decide | owner | ไม่มีเอกสาร (ดู Open questions) |
+| G6 | approve/reject unified campaign ไม่มี role check → ไม่มี To-Be ที่เขียนไว้ | decide | owner | `api-go/internal/delivery/http/router.go` (group `unified`) |
+
 ## Open questions
 
 - To-Be ของ campaign process ทั้งเส้น (ใครอนุมัติ, ใช้ classic หรือ unified เป็นหลัก, จะรวม approval workflow เข้ากับ unified submit หรือไม่) ไม่มีเอกสาร: ต้องให้ owner ตัดสิน
 - จะ deploy dashboard นี้หรือไม่ (`bookmarketing.bookchaowalit.com` ไม่ resolve; `marketing.bookchaowalit.com` เป็นของ repo `marketing-bookmarketing-web`)
-- Classic `campaigns` กับ `unified_campaignes` จะเก็บไว้ทั้งคู่หรือรวมเป็นอันเดียว
+- Classic `campaigns` กับ unified campaigns จะเก็บไว้ทั้งคู่หรือรวมเป็นอันเดียว (G5)
